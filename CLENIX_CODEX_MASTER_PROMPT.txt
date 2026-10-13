@@ -1,0 +1,473 @@
+# CLENIX ISTANBUL — COMPLETE PRODUCTION WEBSITE BUILD PROMPT FOR CODEX
+# Master specification in English. The resulting website MUST be fully localized in Turkish, Russian, Kazakh, and English.
+
+YOU ARE CODEX, ACTING AS A SENIOR PRODUCT ENGINEER, FULL-STACK NEXT.JS DEVELOPER, UI/UX DESIGNER, LOCALIZATION SPECIALIST, AND QA ENGINEER.
+
+Build a complete, working, professional website for CLENIX Istanbul, a cleaning-service business operating across Istanbul, Türkiye. Implement the actual application, not just a design, code snippets, wireframes, recommendations, or a plan. Use the existing project if one is present; otherwise scaffold a new Next.js project in the current directory. Make sensible decisions autonomously. Do not block the build by asking for details that can be configured later; if Telegram credentials are absent, finish a tested integration with clearly documented environment variables and a safe development preview. Run verification commands and fix failures.
+
+========================================================================
+1. PRODUCT GOAL & REFERENCE
+========================================================================
+
+Brand: CLENIX
+Industry: Professional cleaning in Istanbul, Türkiye.
+Customer base: Russian-speaking, Turkish-speaking, Kazakh-speaking, and English-speaking customers living in / managing Istanbul properties.
+Primary conversion: Complete a guided booking/quote form and send a detailed request to the CLENIX operator through a Telegram bot.
+Secondary conversions: Tap to call, open the official Instagram page.
+
+Functional inspiration: https://hi-clean-tr.vercel.app/ and especially https://hi-clean-tr.vercel.app/tr/services
+The reference has a polished landing page and a four-stage booking workflow:
+  1. Location
+  2. Service
+  3. Home / space details and extras
+  4. Contact information
+It also shows an evolving estimate/order summary next to the form.
+
+IMPORTANT: This URL is a functional reference, NOT a design or content source to clone. Create a distinct CLENIX-branded experience. Never reuse their branding, photos, customer reviews, fixed-price claims, contact details, text, logo, or code. Recreate the helpful FUNCTIONAL LOGIC, not the site pixel-for-pixel. If reference access is unavailable, follow this specification without interruption.
+
+========================================================================
+2. SOURCE OF TRUTH: REAL CLENIX BUSINESS DATA
+========================================================================
+
+Official brand name: CLENIX
+Service region: Any district of Istanbul, Türkiye.
+Team: Russian-speaking team.
+Business phone as displayed: 0501 528 44 82
+Phone in international format: +90 501 528 44 82
+Clickable phone URI: tel:+905015284482
+Official Instagram: https://www.instagram.com/clenix_istanbul_/
+Currency: Turkish lira (TRY / ₺).
+
+EXACT services and advertised STARTING rates:
+- General / Deep Cleaning: FROM 60 TRY per square meter.
+- Wet / Maintenance Cleaning: FROM 50 TRY per square meter.
+- Post-Renovation Cleaning: FROM 90 TRY per square meter.
+- After-Tenants / End-of-Tenancy Cleaning: FROM 70 TRY per square meter.
+- Post-Disinfection Cleaning: FROM 70 TRY per square meter.
+- Air Conditioner Cleaning: 500 TRY per unit.
+
+Rate source is user-provided. DO NOT alter numbers, replace square-meter pricing with fixed package prices, invent minimum charges, discounts, or claim any other add-on has a known price.
+
+Factors that can influence FINAL cost after operator confirmation:
+- Exact address / travel distance.
+- Degree of dirt / contamination.
+- Density of furniture / number of items in the space.
+- Area and type of property (apartment, house, office).
+CLENIX selects a suitable solution for the customer's needs.
+
+PRICING TRUTHFULNESS RULES:
+A) For area-based services, calculate only the transparent BASE estimate:
+   area in m² × selected service's stated starting rate per m².
+B) For air-conditioner cleaning, compute 500 TRY × selected AC unit count.
+C) Combined indication = primary area-based estimate + AC cleaning units.
+D) If AC cleaning is selected as the only service, the area field is optional and excluded from the price.
+E) Do NOT add invented surcharges for location, dirt level, furnished spaces, home type, floors, weekends, or property size. These fields inform the operator, not the numeric quote.
+F) Always clearly label the result "Estimated from" / "От" / "Бастап" / "Tahmini başlangıç" or an equivalent native-language label, and explain that final prices are confirmed after reviewing booking details.
+G) Show a detailed transparent formula and itemized price breakdown.
+H) Never mistake "starting price" for a guaranteed final price.
+I) Recalculate every monetary value on the server, ignoring any total submitted by the browser.
+J) Unit display is ₺/m² for area-based service and ₺/unit for AC cleaning.
+
+Illustrative calculations (for automated testing, NOT package advertising):
+- 70 m² General Cleaning = 70 × 60 = 4,200 TRY.
+- 70 m² General Cleaning + 2 AC units = 4,200 + 1,000 = 5,200 TRY.
+- 80 m² Post-Renovation = 80 × 90 = 7,200 TRY.
+- AC-only, 2 units = 1,000 TRY.
+
+Do not invent user reviews, service counts, five-star ratings, response-time guarantees, years of experience, insurance coverage, 24/7 opening hours, or staff counts. Do not publish a fake email, street address, or Telegram public username.
+
+========================================================================
+3. VISUAL IDENTITY FROM THE PROVIDED CLENIX LOGO
+========================================================================
+
+The original user-provided CLENIX logo depicts a dark navy house and cleaning symbol, bright golden-yellow accents, and a white circular background. Its wordmark is bold navy.
+
+Expected logo asset: public/brand/clenix-logo.jpg (or .png / .webp if provided).
+Look for a provided CLENIX logo image in the workspace; use it faithfully. If the image is missing, create a temporary text-only CLENIX wordmark (no fake replacement logo) and document precisely where to put the original image. If the original is a square JPEG with dark corners and a white circular logo, place it in a circular mask/frame or preprocess only the edges carefully without redrawing/altering the brand identity. Never pull HI-Clean's branding into this project.
+
+Design tokens, adjustable by sampling the supplied logo:
+  --navy-950: #061936;   // dark navy typography/footer
+  --navy-900: #08234D;   // primary brand navy
+  --navy-800: #103568;   // secondary navy
+  --yellow-500: #FFCB18; // logo yellow accent
+  --yellow-400: #FFD748; // hover/highlight
+  --white: #FFFFFF;
+  --offwhite: #F7F9FC;
+  --muted: #617087;
+  --border: #E4EAF2;
+Adjust the exact values subtly if the original image suggests it; do NOT drift into purple, green, teal, or an HI-Clean-like copied palette.
+
+Look: premium, approachable, confident, modern, clean, airy; high design polish. Generous whitespace, soft navy typography, balanced golden accent, fine borders, soft shadows, rounded cards, subtle grain/grid/micro-patterns if tasteful, professional service illustrations/icons. Emphasize conversion and legibility over decorative complexity.
+
+Typography: modern readable UI fonts with strong Latin + Cyrillic support (e.g., Manrope / Inter + suitable fallback), no exotic typefaces that break Kazakh characters ә, ғ, қ, ң, ө, ұ, ү, һ, і. Verify diacritics in Turkish (ı, İ, ğ, ş, ç, ö, ü) and Kazakh. Excellent hierarchy and contrast. Yellow is an accent, not small text on white. Ensure accessible contrast.
+
+Motion: subtle, fast, respect prefers-reduced-motion; hover and step transitions without content shifting or performance degradation. Mobile-first, high-quality at ~360px, tablet ~768px, desktop 1280–1600px. Sticky mobile booking CTA. Avoid horizontal overflow. Keyboard and screen reader-friendly interactions.
+
+========================================================================
+4. REQUIRED TECHNOLOGY
+========================================================================
+
+- Next.js latest stable compatible release, App Router, TypeScript, strict mode.
+- React, Tailwind CSS, CSS variables for brand tokens.
+- shadcn/ui or similarly accessible headless primitives for form controls, buttons, dialog, select, toast; lucide-react icons.
+- next-intl (or an equally robust App Router i18n approach) for 4 full locales.
+- react-hook-form + zod for client-side and server-side validation.
+- Server route handler POST /api/bookings to securely send request to Telegram Bot API.
+- No paid services or database are required for MVP; keep architecture expandable.
+- Server Components for mostly static pages, Client Components only where needed (wizard, interactions).
+- Optimized images, semantic HTML, metadata, localized SEO, sitemap/robots.
+- Vitest (or Jest) for pure-pricing and validation tests; Playwright for critical user flows if feasible.
+- ESLint, prettier optional, readable project structure, .env.example, README.
+- Must deploy cleanly on Vercel; no dependency on localhost servers or long-lived processes.
+
+Do not add unrelated AI APIs, unnecessary CMS, invented payment integrations, abandoned third-party SDKs, or backend frameworks. Keep core calculation as pure, deterministic, tested TypeScript, e.g. src/lib/pricing.ts and src/lib/booking-schema.ts.
+
+========================================================================
+5. SITE MAP / INFORMATION ARCHITECTURE
+========================================================================
+
+Use locale-prefixed routes:
+  /                    => redirect to /tr (default Turkish)
+  /tr, /ru, /kk, /en   => fully localized homepage
+  /tr/book, /ru/book, /kk/book, /en/book => booking wizard
+  /[locale]/privacy    => localized concise privacy page
+  /[locale]/terms      => localized service inquiry terms (no invented legal policies)
+  /api/bookings        => POST server-only API for Telegram delivery
+Optional custom 404 and error boundaries in each locale.
+
+Header:
+- Faithful CLENIX logo and brand name.
+- Navbar links to Services, Why CLENIX, Pricing, How It Works, FAQ, Contact.
+- Language switcher with labels TR / RU / ҚАЗ / EN and accessible full names.
+- Prominent "Get a quote" / "Book cleaning" CTA.
+- Mobile accessible burger menu, functional nav, visible CTA.
+
+Homepage sections, in an intentionally thoughtful flow:
+1) HERO: distinct large heading, short clear offer, Istanbul availability, primary booking CTA and phone CTA. Use brand navy and yellow; a premium visual composition with cleaning/house imagery or brand illustration. Do not use unlicensed images or assert photos belong to CLENIX if they do not.
+2) TRUST HIGHLIGHTS: Russian-speaking team, works throughout Istanbul, transparent starting rates and personalized quote. Never claim verified reviews or ratings.
+3) SERVICES: all SIX real services in elegant icon/cards, each with exact starting price; CTA selects corresponding service and opens booking wizard.
+4) LIVE QUICK ESTIMATOR (optional but strongly preferred): service, area, optional AC units, instant honest breakdown, CTA "Continue booking" carrying the selection. The full wizard still includes the summary sidebar.
+5) FACTORS AFFECTING FINAL PRICE: address, dirt level, furniture, size/property type, with a clear explanation about confirmation.
+6) HOW IT WORKS: choose a service, tell us about the property, submit a request, operator confirms availability and final cost. Do not promise a confirmed appointment instantly.
+7) WHY CLENIX: clean original features based on provided facts, no fake credentials.
+8) FAQ: well-written questions on pricing, Istanbul coverage, Russian-speaking support, choosing service, and confirmation. No unsupported claims about turnaround or supplies.
+9) HIGH-CONVERSION CTA: contact and guided booking.
+10) FOOTER: same business phone, official Instagram, locale switcher, anchor links, privacy/terms, © current year CLENIX, Istanbul.
+
+Never create dummy clickable links. If a section has a CTA it must work. Smooth scroll is OK. Navigation should preserve the active locale.
+
+========================================================================
+6. FOUR-STEP FULL BOOKING WIZARD — COMPLETE FUNCTIONALITY
+========================================================================
+
+Implement an elegant, functioning, responsive multi-step form with accessible progress indicators (1 Location, 2 Service, 3 Space & Extras, 4 Contact), back/continue buttons, per-step validation, persistence of form values when moving back, and live price summary (sticky sidebar on desktop, compact expanding summary on mobile). Frontend must remain coherent when starting the flow from a service card or quick estimate.
+
+STEP 1 — LOCATION
+- City: Istanbul (read-only or clearly fixed, not a fake city selector).
+- Istanbul district/ilçe: required, real list of all 39 current Istanbul districts; searchable combobox/select.
+- Neighborhood/mahalle: optional text.
+- Street/building/address: required free text, sensible maximum length.
+- Building/floor/apartment number: optional individual fields if reasonable; floor may also be a separate value.
+- Property type: apartment, house/villa, office, other (select, relevant for estimate context).
+- Access notes, gate/intercom etc.: optional, limited length (avoid collecting more PII than necessary).
+- Validate Istanbul district chosen; never pretend location changes price according to a non-existent distance matrix.
+
+All 39 Istanbul districts to include as selectable raw district names:
+Adalar, Arnavutköy, Ataşehir, Avcılar, Bağcılar, Bahçelievler, Bakırköy, Başakşehir, Bayrampaşa, Beşiktaş, Beykoz, Beylikdüzü, Beyoğlu, Büyükçekmece, Çatalca, Çekmeköy, Esenler, Esenyurt, Eyüpsultan, Fatih, Gaziosmanpaşa, Güngören, Kadıköy, Kağıthane, Kartal, Küçükçekmece, Maltepe, Pendik, Sancaktepe, Sarıyer, Silivri, Sultanbeyli, Sultangazi, Şile, Şişli, Tuzla, Ümraniye, Üsküdar, Zeytinburnu.
+
+STEP 2 — CHOOSE SERVICE
+- Show all six service cards with translated names, descriptions, correct rate and selection state.
+- Allow exactly one primary service:
+  * General cleaning (60 ₺/m²)
+  * Wet / maintenance cleaning (50 ₺/m²)
+  * After renovation (90 ₺/m²)
+  * After tenants (70 ₺/m²)
+  * After disinfection (70 ₺/m²)
+  * Air conditioner cleaning only (500 ₺/unit)
+- For area-based selections, a/c cleaning can ALSO be added separately in step 3, without double counting.
+- If primary service is AC-only, hide nonrelevant area-price controls, make unit count required, and never require a square-meter value just to buy AC cleaning.
+- Preserve current service when switched, clear invalid dependents cleanly.
+
+STEP 3 — SPACE & EXTRAS
+- Required cleaned area for area-based services: positive numeric square meters, plausible, configurable bounds (e.g. 10–20,000; use appropriate numeric input and friendly validation). Make bounds a product/validation constraint, NOT a pricing tier.
+- Rooms/bedrooms count and bathrooms count: simple selectors/steppers (optional unless reason to require).
+- Dirt level: light / moderate / heavy / very heavy (all localized), informational only.
+- Furnishing: empty / partially furnished / fully furnished, informational only.
+- Optional AC cleaning extra (for non-AC-only primary services): toggle and count selector, 500 ₺ per unit; count=0 when not selected.
+- If AC-only, require 1 or more units and show 500 ₺ × units.
+- Date: customer's preferred date, not in the past; time window or preferred time; mark as "preferred, subject to confirmation". Consider timezone Europe/Istanbul.
+- Free-text notes / special requests, length-limited, sanitized for output.
+- No additional priced extras may be fabricated. If you allow mentioning windows, ovens, etc., present them only as text requests that require operator confirmation, NOT priceable promised services.
+
+STEP 4 — CONTACT & REVIEW
+- Customer name: required.
+- Phone: required, validate Türkiye and international formats reasonably; do not reject legitimate international customer numbers without reason.
+- Preferred contact channel: phone call / WhatsApp / Telegram (contact preference only; the business has not confirmed a public WhatsApp link or official public bot; do not imply instant contact there).
+- Telegram username optional if Telegram selected; optional email if desired.
+- Terms/privacy acknowledgement checkbox required; link to real translated privacy content; do not pre-check.
+- Render complete, localized booking recap before submission, including all chosen fields and price calculation.
+- Final button "Send request" / native translations.
+- While submitting: disabled CTA and loading indicator to prevent duplicates.
+- On success: elegant localized success state, clearly say REQUEST SENT, operator will review and contact to confirm; show booking reference (generated server-side) if implemented, not "appointment confirmed".
+- On failure: show clear actionable localized error, do NOT clear user's form data, allow safe retry; do not falsely say success or silently redirect to Telegram app.
+- If user exits or reloads mid-wizard, lightweight temporary state persistence for non-sensitive choices is acceptable, but avoid localStorage persistence of full name, phone, street address, or other PII unless there is explicit informed consent.
+
+ORDER SUMMARY (sidebar / mobile drawer):
+- Service name and per-m² starting rate.
+- Area in m² and price subtotal, if applicable.
+- Air-conditioner units and cost if applicable.
+- District and property type (informational).
+- Estimated STARTING total clearly displayed in TRY, with correct locale number formatting via Intl.NumberFormat.
+- Below price: "Final price depends on address, degree of dirt, furnishing and room type; confirmed after CLENIX reviews the details."
+- If area not yet entered, show a clear "Enter area to see your estimate" prompt and do not display 0 TRY as an actual quote.
+- Never label estimate as an invoice, payment due, fixed price, or final agreement.
+
+========================================================================
+7. TELEGRAM BOT INTEGRATION — REAL, SECURE, SERVER-SIDE
+========================================================================
+
+The request MUST be sent to the CLENIX operator's chat or group using a Telegram bot managed by the business. Customers do NOT need Telegram to submit a booking, and submitting MUST NOT require opening a t.me deep link.
+
+Environment configuration:
+  TELEGRAM_BOT_TOKEN=             (secret, server only)
+  TELEGRAM_CHAT_ID=               (personal or group chat ID, server only)
+  TELEGRAM_MESSAGE_THREAD_ID=     (optional, for forum-topic groups)
+  NEXT_PUBLIC_SITE_URL=           (Vercel production URL)
+Optional recommended abuse mitigation:
+  UPSTASH_REDIS_REST_URL=
+  UPSTASH_REDIS_REST_TOKEN=
+  TURNSTILE_SITE_KEY=             (public key if using Cloudflare Turnstile)
+  TURNSTILE_SECRET_KEY=           (server only)
+
+Build POST /api/bookings using Next.js Route Handler. Must:
+- Strictly validate request body using Zod server-side, including enums, length, date, consent, counts, and required fields based on service.
+- Validate content type, bound request size, and reject malformed input.
+- Independently calculate the correct quoted starting amount from a central pricing config.
+- Escape HTML if using Telegram parse_mode HTML; never interpolate unescaped user input into formatted HTML. No injection or markup breaking.
+- Format a high-quality structured Telegram notification, for example:
+  🧼 CLENIX — NEW CLEANING REQUEST
+  🆔 Ref: CLX-20261013-XXXXX
+  🌍 Language: ru
+  👤 Name: [user]
+  📞 Phone: [user]
+  📩 Preferred contact: [user]
+  📍 Istanbul, [district], [full address]
+  🏠 Space: [property type], [area] m², [rooms] rooms, [bathrooms] bathrooms
+  🧹 Service: [service]
+  🌀 AC units: [count]
+  🧽 Dirt: [level]; furnishing: [level]
+  🗓 Preferred date/time: [user]
+  📝 Notes: [user]
+  💰 Estimated STARTING cost: [area × tariff] + [AC units × 500] = [total] TRY
+  ⚠️ Final quote and booking subject to CLENIX confirmation.
+  📅 Submitted at: ISO timestamp in Europe/Istanbul format.
+- Call https://api.telegram.org/bot<TOKEN>/sendMessage strictly from server-side fetch with timeout/AbortController; check HTTP status AND Telegram ok=true; use chat_id from env.
+- If optional thread id is present, pass message_thread_id.
+- Return clean JSON with success/reference or safe error; never expose bot token, chat ID, stack traces, upstream response body, or customer details to the browser console.
+- Prevent duplicate submissions by disable/guard in client and an appropriate idempotency strategy on server if feasible; avoid aggressive automatic Telegram retries that duplicate operator requests.
+- Apply anti-spam: hidden honeypot, server-side rate limiting (implement an optional Vercel-compatible Upstash Redis limiter rather than pretending an in-memory Map is persistent on serverless); optional Turnstile verification if configured. Site should function in development without third-party spam keys.
+- No "success" when Telegram send fails, or when credentials aren't configured. In development, return a clear configuration error or provide an explicitly labeled MOCK mode not enabled in production.
+- Privacy: do not add unnecessary logs of PII and do not persist customer address/phone in a database unless deliberately configured. Treat data sent to Telegram as a disclosed contact/booking processing step.
+- Document how the business creates a bot via @BotFather, starts/adds the bot to the target chat, finds the correct chat ID (e.g. getUpdates), sets env vars in Vercel, redeploys, and sends a real end-to-end test booking. Do not invent a bot username, token or chat id.
+
+========================================================================
+8. COMPLETE FOUR-LANGUAGE LOCALIZATION
+========================================================================
+
+ALL website copy, buttons, input labels, validation messages, success/error toasts, form steps, FAQ, metadata, service descriptions, consent labels, rate disclaimer, and footer must be translated (no empty keys, no fallback mixing). Include native, idiomatic translations reviewed for clarity; do not produce machine-like transliteration of Russian into Kazakh. Store dictionaries e.g. messages/tr.json, ru.json, kk.json, en.json; centralized service IDs remain language-independent.
+
+Locales and URL segments:
+  tr — Türkçe (DEFAULT)
+  ru — Русский
+  kk — Қазақша (Kazakh, Cyrillic)
+  en — English
+
+Language switcher behavior: preserve equivalent page/anchor whenever practical; preserve non-sensitive active booking choices on locale switch if feasible; set <html lang=...>, correct SEO hreflang alternates, localize metadata. Istanbul district names may stay in official Turkish spelling so addresses remain operationally unambiguous. Locale-sensitive date and TRY currency formatting are mandatory.
+
+Use the following localization glossary, respecting its terminology:
+
+SERVICE 1, 60 ₺/m²:
+  tr: Detaylı / Genel Temizlik
+  ru: Генеральная уборка
+  kk: Күрделі тазалау
+  en: Deep / General Cleaning
+SERVICE 2, 50 ₺/m²:
+  tr: Islak / Rutin Temizlik
+  ru: Влажная уборка
+  kk: Ылғалды тазалау
+  en: Wet / Maintenance Cleaning
+SERVICE 3, 90 ₺/m²:
+  tr: Tadilat Sonrası Temizlik
+  ru: Уборка после ремонта
+  kk: Жөндеуден кейінгі тазалау
+  en: Post-Renovation Cleaning
+SERVICE 4, 70 ₺/m²:
+  tr: Kiracı Sonrası Temizlik
+  ru: Уборка после квартирантов
+  kk: Жалға алушылардан кейінгі тазалау
+  en: After-Tenants Cleaning
+SERVICE 5, 70 ₺/m²:
+  tr: Dezenfeksiyon Sonrası Temizlik
+  ru: Уборка после дезинфекции
+  kk: Дезинфекциядан кейінгі тазалау
+  en: Post-Disinfection Cleaning
+SERVICE 6, 500 ₺/unit:
+  tr: Klima Temizliği
+  ru: Чистка кондиционера
+  kk: Кондиционерді тазалау
+  en: Air Conditioner Cleaning
+
+CORE HEADLINE / COPY PROPOSALS — use these or improve them while preserving truth:
+  tr hero title: "İstanbul’da tertemiz bir yaşam alanı."
+  tr hero subtext: "CLENIX ile eviniz, ofisiniz veya yaşam alanınız için özenli temizlik. Şeffaf başlangıç fiyatları ve Rusça konuşan ekibimizle İstanbul’un her ilçesindeyiz."
+  ru hero title: "Чистота, в которую хочется возвращаться."
+  ru hero subtext: "CLENIX — профессиональная уборка квартир, домов и офисов по всему Стамбулу. Русскоговорящая команда и прозрачные цены от указанной стоимости за м²."
+  kk hero title: "Таза кеңістік — жайлы өмір."
+  kk hero subtext: "CLENIX Стамбұлдың барлық аудандарында пәтерлерді, үйлерді және кеңселерді тазалау қызметін ұсынады. Орыс тілінде сөйлейтін команда, ашық бастапқы бағалар."
+  en hero title: "A cleaner space. A lighter day."
+  en hero subtext: "CLENIX provides careful cleaning for apartments, homes and offices across Istanbul, with clear starting rates and a Russian-speaking team."
+
+KEY ACTION TRANSLATIONS:
+  tr: "Fiyat teklifi al" (Get a quote); "Temizlik talebi oluştur" (Book/request cleaning); "Devam et" (Continue); "Geri" (Back); "Talebi gönder" (Send request); "Tahmini başlangıç fiyatı" (Estimated starting price).
+  ru: "Рассчитать стоимость"; "Заказать уборку"; "Продолжить"; "Назад"; "Отправить заявку"; "Предварительная стоимость от".
+  kk: "Бағасын есептеу"; "Тазалауға өтінім беру"; "Жалғастыру"; "Артқа"; "Өтінімді жіберу"; "Бастапқы болжамды баға".
+  en: "Get an estimate"; "Request cleaning"; "Continue"; "Back"; "Send request"; "Estimated starting price".
+
+FORM STEP TRANSLATIONS:
+  tr: "Konum" / "Hizmet" / "Alan ve ek hizmetler" / "İletişim".
+  ru: "Адрес" / "Услуга" / "Помещение и дополнения" / "Контакты".
+  kk: "Мекенжай" / "Қызмет" / "Үй-жай және қосымша қызметтер" / "Байланыс".
+  en: "Location" / "Service" / "Space & extras" / "Contact".
+
+PRICE FACTORS — user-provided truth in all four languages:
+  tr: "Fiyat; adres ve ulaşım mesafesine, kirlilik seviyesine, eşya ve mobilya yoğunluğuna, alanın büyüklüğüne ve türüne göre değişebilir. Kesin tutar, bilgiler değerlendirildikten sonra onaylanır."
+  ru: "Цена зависит от адреса и расстояния, степени загрязнения, количества мебели и вещей, площади и типа помещения. Точную стоимость подтвердим после уточнения деталей."
+  kk: "Баға мекенжай мен қашықтыққа, ластану деңгейіне, жиһаз бен заттардың санына, бөлменің ауданы мен түріне байланысты өзгеруі мүмкін. Нақты баға мәліметтер нақтыланған соң расталады."
+  en: "The final price may vary based on location and travel, dirt level, furniture density, area and property type. CLENIX will confirm the exact quote after reviewing the details."
+
+TEAM & COVERAGE:
+  tr: "Rusça konuşan ekip" / "İstanbul’un tüm ilçelerinde"
+  ru: "Русскоговорящая команда" / "Работаем по всему Стамбулу"
+  kk: "Орыс тілінде сөйлейтін команда" / "Стамбұлдың барлық аудандарында"
+  en: "Russian-speaking team" / "Across all Istanbul districts"
+
+CONTACT / SUCCESS COPY:
+  tr success: "Talebiniz gönderildi. CLENIX ekibi ayrıntıları inceleyip uygunluk ve kesin fiyat için sizinle iletişime geçecek."
+  ru success: "Заявка отправлена. Команда CLENIX проверит детали и свяжется с вами для подтверждения стоимости и времени."
+  kk success: "Өтініміңіз жіберілді. CLENIX командасы мәліметтерді қарап, нақты баға мен уақытты растау үшін сізбен байланысады."
+  en success: "Your request has been sent. The CLENIX team will review it and contact you to confirm availability and the final price."
+
+Write complete localization dictionaries for ALL OTHER UI text as part of implementation. Do not stop after translating only the glossary. All six services must have distinct, accurate short descriptions in every locale. Use native terms correctly (not generic copied service bullet lists).
+
+========================================================================
+9. CUSTOMER EXPERIENCE DETAILS
+========================================================================
+
+- Instant recalculation on any area, service, or AC count change.
+- Accurate localized format for thousands and decimals; use integer TRY totals, no unannounced rounding; area may accept positive decimals (e.g. 72.5 m²), define consistent arithmetic and unit tests.
+- Smart service preselection via safe query param e.g. /ru/book?service=deep-cleaning, and optional area via validated query params.
+- Keep CTA destinations in current locale.
+- Show field-level error text with accessible aria associations, keyboard-usable select, focused invalid fields.
+- Use native date input or accessible date picker; never allow a past date in Istanbul local date calculation.
+- Graceful loading/empty/error states, no dead-end screens.
+- Phone and Instagram links are true, click correctly; don't show an unverified WhatsApp business button.
+- Privacy notice: tell customers booking details will be transmitted to the CLENIX team via Telegram for handling the request. Provide a simple editable policy that makes no unsupported legal assurances; do not use cookie consent if only essential cookies / no tracking.
+- Sticky summary should not overlap footer, validation text, buttons, or mobile keyboard.
+- If external imagery is used, it must be licensed appropriately and not presented as photos of actual CLENIX work without proof. Use brand shapes and self-contained CSS/SVG illustrations where fitting.
+- Polish both RTL assumptions (none: all four locales LTR) and Cyrillic line wrapping; no clipped translated buttons.
+
+========================================================================
+10. PROJECT FILE ORGANIZATION (GUIDELINE)
+========================================================================
+
+Prefer a clean architecture similar to:
+  src/app/[locale]/page.tsx
+  src/app/[locale]/book/page.tsx
+  src/app/[locale]/privacy/page.tsx
+  src/app/[locale]/terms/page.tsx
+  src/app/api/bookings/route.ts
+  src/app/layout.tsx
+  src/components/layout/Header.tsx
+  src/components/layout/Footer.tsx
+  src/components/home/*
+  src/components/booking/BookingWizard.tsx
+  src/components/booking/StepLocation.tsx
+  src/components/booking/StepService.tsx
+  src/components/booking/StepDetails.tsx
+  src/components/booking/StepContact.tsx
+  src/components/booking/QuoteSummary.tsx
+  src/lib/pricing.ts
+  src/lib/services.ts
+  src/lib/districts.ts
+  src/lib/booking-schema.ts
+  src/lib/telegram.ts
+  src/lib/rate-limit.ts
+  src/i18n/*
+  messages/tr.json
+  messages/ru.json
+  messages/kk.json
+  messages/en.json
+  public/brand/clenix-logo.jpg
+  tests/*
+  .env.example
+  README.md
+
+Use good judgment, no need to follow the paths slavishly. Centralize one canonical services/rates config and share it across UI, price calculator, validators and message formatter. Don't duplicate rates in localization files.
+
+========================================================================
+11. DEPLOYMENT, SECURITY & VERIFICATION
+========================================================================
+
+Implement, test, and verify:
+
+A. Main build / checks:
+   npm install (or an existing compatible package manager)
+   npm run lint
+   npm run typecheck (add script)
+   npm run test (add script and pricing/validation/Telegram formatting tests)
+   npm run build
+B. Correct estimate calculation across all six services, combined AC selection, decimal area, AC-only, invalid/empty area, and no invented surcharges.
+C. Booking validation rejects absent name, invalid district, bad service, negative area/AC count, missing consent and malformed phone/date; limits note length and payload size.
+D. API test with mocked Telegram verifies successful notifications, escaping hostile input, failure when the bot returns ok=false, configuration errors, and that server sends recomputed prices.
+E. Language-switch smoke tests for every locale, no missing translations, Turkish/Kazakh letters render properly.
+F. E2E flow: choose a service from homepage -> district/address -> property -> 70 m² -> add 2 AC -> contact -> confirm estimate -> submit to mocked API -> success. Verify back navigation and mobile viewport.
+G. Ensure no API token is prefixed NEXT_PUBLIC, embedded in client bundle, tracked in git, or printed in logs.
+H. Check accessible contrast, no horizontal scroll on 360px, 768px, 1440px viewport widths, and decent Lighthouse-friendly performance.
+I. No TypeScript 'any' as a shortcut in core flows and no placeholder buttons.
+
+Provide a comprehensive README with exact local start and Vercel deployment steps, bot setup instructions, environment variables, how to test a Telegram notification, logo asset placement, price configuration file location, and deployment caveats. Example Vercel sequence: create git repo -> push to GitHub -> import into Vercel -> set environment variables -> deploy -> test in production. If token/chat id is missing, explain candidly that a LIVE send requires these inputs from the business; everything else must be complete and tested.
+
+========================================================================
+12. EXECUTION INSTRUCTIONS AND DEFINITION OF DONE
+========================================================================
+
+Do not just describe what you would create. CREATE THE FILES AND WORKING CODE IN THE WORKSPACE.
+
+Execution order:
+1. Inspect existing workspace and supplied logo files; avoid wiping user work.
+2. Briefly identify existing stack or scaffold Next.js.
+3. Create design system, global layout, full four-locale dictionaries and site sections.
+4. Implement shared service/rate config and deterministic price estimation.
+5. Implement the fully working 4-step booking experience.
+6. Implement secure Telegram server route, validation, and handling of missing credentials.
+7. Add responsive refinements, SEO, policies, accessibility, tests, documentation.
+8. Actually execute scripts, fix TypeScript/build/lint/test failures; visually inspect when browser tools exist.
+9. Report delivered features, commands/tests run and results, remaining external configuration ONLY (bot token/chat id/site URL/logo if not supplied), and precise deployment instructions.
+
+Acceptance criteria:
+[ ] CLENIX logo and navy/yellow visual identity.
+[ ] Distinct premium homepage; not an HI-Clean clone.
+[ ] Six correct service prices and complete business info.
+[ ] Four polished localized websites: Turkish, Russian, Kazakh, English.
+[ ] Fully working 4-step request form with validation and live sidebar estimate.
+[ ] Apartment, house, office, address, district, contamination, furnishing, preferred time, contact and consent captured.
+[ ] No invented pricing modifiers or false testimonials.
+[ ] AC cleaning as extra AND a standalone 500 TRY/unit service.
+[ ] Secure end-to-end Telegram bot notification, only report success on real acceptance by Telegram.
+[ ] Responsive desktop/mobile UI, accessible controls, good SEO.
+[ ] Tests pass and production build succeeds.
+[ ] Production-ready Vercel deployment instructions and .env.example.
+
+Build at a quality level appropriate for a real company receiving actual cleaning requests. The user should be able to clone/push/deploy, add environment values and logo, and start receiving genuine leads. Make the work complete, cohesive and professional rather than generating a partial starter template.
+
+BEGIN IMPLEMENTATION NOW.
