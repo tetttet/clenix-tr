@@ -455,22 +455,22 @@ export default function BookingWizard({
                 </div>
                 <div>
                   <label htmlFor="district">{t("district")} *</label>
-                  <input
+                  <select
                     id="district"
-                    list="istanbul-districts"
-                    placeholder={t("chooseDistrict")}
                     {...register("district")}
                     aria-required="true"
                     aria-invalid={!!errors.district}
                     aria-describedby={
                       errors.district ? "district-error" : undefined
                     }
-                  />
-                  <datalist id="istanbul-districts">
+                  >
+                    <option value="" disabled>
+                      {t("chooseDistrict")}
+                    </option>
                     {districts.map((d) => (
                       <option key={d} value={d} />
                     ))}
-                  </datalist>
+                  </select>
                   {errors.district && (
                     <p className="field-error" id="district-error">
                       {errors.district.message}

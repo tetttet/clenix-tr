@@ -13,7 +13,7 @@ test("deep cleaning + two AC units, back navigation and successful request", asy
   });
   await page.goto("/en");
   await page.locator("a.service-deep-cleaning").click();
-  await page.getByLabel("District *", { exact: true }).fill("Kadıköy");
+  await page.getByLabel("District *", { exact: true }).selectOption("Kadıköy");
   await page
     .getByLabel("Street, building & full address")
     .fill("Test street, building 10");
@@ -52,7 +52,7 @@ test("AC-only needs no area and API failure retains customer details", async ({
     route.fulfill({ status: 503, json: { code: "CONFIGURATION" } }),
   );
   await page.goto("/en/book?service=ac&acUnits=2");
-  await page.getByLabel("District *", { exact: true }).fill("Beşiktaş");
+  await page.getByLabel("District *", { exact: true }).selectOption("Beşiktaş");
   await page
     .getByLabel("Street, building & full address")
     .fill("Test address 20");
@@ -123,6 +123,7 @@ test("all locales, policies and responsive widths render without overflow", asyn
 test("mobile navigation and estimator work", async ({ page }) => {
   await page.setViewportSize({ width: 360, height: 800 });
   await page.goto("/en");
+  await expect(page.locator("#quick-area")).toHaveCSS("font-size", "16px");
   await page.getByRole("button", { name: "Open menu", exact: true }).click();
   await page
     .getByRole("dialog")
@@ -168,12 +169,15 @@ test("booking mobile bar keeps price visible and navigates through validated ste
   await page.setViewportSize({ width: 360, height: 800 });
   await page.goto("/ru/book?service=ac&acUnits=2");
   await page.waitForLoadState("networkidle");
+  await expect(page.locator("#district")).toHaveCSS("font-size", "16px");
+  await expect(page.locator("#address")).toHaveCSS("font-size", "16px");
   const bar = page.locator(".booking-mobile-nav");
   await expect(bar).toBeVisible();
   await expect(bar.locator(".booking-mobile-price")).toContainText("1 000");
   await bar.getByRole("button", { name: "Продолжить" }).click();
   await expect(page.locator("#district-error")).toBeVisible();
-  await page.getByLabel("Район *", { exact: true }).fill("Beşiktaş");
+  await expect(page.locator("#district option")).toHaveCount(40);
+  await page.getByLabel("Район *", { exact: true }).selectOption("Beşiktaş");
   await page.getByLabel("Улица, дом и полный адрес").fill("Test address 20");
   await bar.getByRole("button", { name: "Продолжить" }).click();
   await expect(page.locator(".wizard-heading")).toContainText("02 / 04");
