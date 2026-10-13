@@ -38,20 +38,33 @@ describe("Telegram and HTTP boundary", () => {
   it("escapes hostile content without treating it as markup", () => {
     const text = formatTelegram(
       fixture({ name: "<b>A & B</b>", notes: '<script>alert("x")</script>' }),
-      "CLX-TEST",
+      "CLX-<TEST>",
     );
     expect(text).toContain("&lt;b&gt;A &amp; B&lt;/b&gt;");
+    expect(text).toContain("CLX-&lt;TEST&gt;");
     expect(text).not.toContain("<script>");
-    expect(text).toContain("ИТОГО ОТ 5200 TRY");
+    expect(text).toMatch(/Итого от: 5\s200 ₺/);
     expect(text.length).toBeLessThan(4096);
+  });
+  it("groups details and shows one readable Istanbul submission time", () => {
+    const text = formatTelegram(
+      fixture({ date: "2026-10-30", neighborhood: "" }),
+      "CLX-TEST",
+      new Date("2026-10-13T18:09:13.838Z"),
+    );
+    expect(text).toContain("📅 <b>Дата и время</b>");
+    expect(text).toContain("<b>пятница, 30 октября 2026 г.</b> · Утро");
+    expect(text).toContain("Стамбул · Kadıköy\nExample street 10");
+    expect(text).toContain("Отправлено: 13 октября 2026 г. в 21:09 (Стамбул)");
+    expect(text).not.toContain("2026-10-13T18:09");
   });
   it("keeps the Telegram template in Russian for every site locale", () => {
     for (const locale of ["en", "tr", "kk", "ru"] as const) {
       const text = formatTelegram(fixture({ locale }), "CLX-TEST");
-      expect(text).toContain("НОВАЯ ЗАЯВКА НА УБОРКУ");
+      expect(text).toContain("НОВАЯ ЗАЯВКА · CLENIX");
       expect(text).toContain("Услуга: Генеральная уборка");
-      expect(text).toContain("Предпочтительный способ связи: Звонок");
-      expect(text).toContain("ИТОГО ОТ 5200 TRY");
+      expect(text).toContain("Связь: Звонок");
+      expect(text).toMatch(/Итого от: 5\s200 ₺/);
       expect(text).not.toContain("NEW CLEANING REQUEST");
     }
   });
@@ -69,7 +82,7 @@ describe("Telegram and HTTP boundary", () => {
     });
     const args = fetcher.mock.calls[0] as unknown as [string, RequestInit];
     const sent = JSON.parse(String(args[1].body));
-    expect(sent.text).toContain("ИТОГО ОТ 5200 TRY");
+    expect(sent.text).toMatch(/Итого от: 5\s200 ₺/);
     expect(sent.chat_id).toBe("-1001234567890");
     expect(sent.message_thread_id).toBe(42);
     expect(sent.parse_mode).toBe("HTML");

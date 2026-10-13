@@ -23,29 +23,74 @@ export function formatTelegram(
     kk: "Казахский",
     en: "Английский",
   }[b.locale];
+  const safe = (value: string | number) => escapeHtml(String(value));
+  const numbers = new Intl.NumberFormat("ru-RU");
+  const amount = (value: number) => `${numbers.format(value)} ₺`;
+  const desiredDate = new Intl.DateTimeFormat("ru-RU", {
+    timeZone: "UTC",
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  }).format(new Date(`${b.date}T12:00:00Z`));
+  const submittedAt = new Intl.DateTimeFormat("ru-RU", {
+    timeZone: "Europe/Istanbul",
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(now);
+  const location = ["Стамбул", b.district, b.neighborhood]
+    .filter(Boolean)
+    .map(safe)
+    .join(" · ");
   const rows = [
-    "<b>🧼 CLENIX — НОВАЯ ЗАЯВКА НА УБОРКУ</b>",
-    `Номер заявки: ${reference}`,
-    `Язык сайта: ${language}`,
-    `Имя: ${b.name}`,
-    `Телефон: ${b.phone}`,
-    `Предпочтительный способ связи: ${option(b.contact)}${b.contact === "telegram" && b.telegram ? ` (${b.telegram})` : ""}`,
-    `Адрес: Стамбул, ${b.district}, ${b.neighborhood}, ${b.address}`,
-    `Этаж: ${b.floor || "—"}; квартира: ${b.apartment || "—"}`,
-    `Доступ / домофон: ${b.access || "—"}`,
-    `Тип помещения: ${option(b.property)}; площадь: ${b.service === "ac" ? "не учитывается в расчёте" : `${b.area} м²`}; комнат: ${b.rooms ?? "—"}; ванных: ${b.bathrooms ?? "—"}`,
-    `Услуга: ${ru.services[b.service].name}`,
-    `Количество кондиционеров: ${b.acUnits}`,
-    `Загрязнение: ${option(b.dirt)}; меблировка: ${option(b.furnishing)}`,
-    `Желаемая дата: ${b.date}; время: ${option(b.time)} (Стамбул)`,
-    `Примечания: ${b.notes || "—"}`,
-    `Предварительная стоимость от: ${b.service === "ac" ? "" : `${b.area} м² × ${services[b.service].rate} TRY = ${q.areaSubtotal} TRY; `}${b.acUnits} кондиционеров × ${services.ac.rate} TRY = ${q.acSubtotal} TRY; ИТОГО ОТ ${q.total} TRY`,
+    "🧼 <b>НОВАЯ ЗАЯВКА · CLENIX</b>",
+    `<b>№ ${safe(reference)}</b> · ${safe(language)}`,
+    "",
+    "📅 <b>Дата и время</b>",
+    `<b>${safe(desiredDate)}</b> · ${safe(option(b.time))}`,
+    "Время указано по Стамбулу",
+    "",
+    "👤 <b>Клиент</b>",
+    `Имя: ${safe(b.name)}`,
+    `Телефон: ${safe(b.phone)}`,
+    `Связь: ${safe(option(b.contact))}${b.contact === "telegram" && b.telegram ? ` · ${safe(b.telegram)}` : ""}`,
+    "",
+    "📍 <b>Адрес</b>",
+    location,
+    safe(b.address),
+    `Этаж: ${safe(b.floor || "—")} · Квартира: ${safe(b.apartment || "—")}`,
+    `Доступ / домофон: ${safe(b.access || "—")}`,
+    "",
+    "🧹 <b>Детали уборки</b>",
+    `Услуга: ${safe(ru.services[b.service].name)}`,
+    `Помещение: ${safe(option(b.property))}${b.service === "ac" ? "" : ` · ${safe(numbers.format(b.area!))} м²`}`,
+    `Комнат: ${safe(b.rooms ?? "—")} · Ванных: ${safe(b.bathrooms ?? "—")}`,
+    `Кондиционеры: ${safe(b.acUnits)}`,
+    `Загрязнение: ${safe(option(b.dirt))} · Мебель: ${safe(option(b.furnishing))}`,
+    ...(b.notes ? ["", "📝 <b>Пожелания</b>", safe(b.notes)] : []),
+    "",
+    "💰 <b>Предварительная стоимость</b>",
+    ...(b.service === "ac"
+      ? []
+      : [
+          `Уборка: ${safe(numbers.format(b.area!))} м² × ${amount(services[b.service].rate)} = ${amount(q.areaSubtotal)}`,
+        ]),
+    ...(b.acUnits
+      ? [
+          `Кондиционеры: ${safe(b.acUnits)} × ${amount(services.ac.rate)} = ${amount(q.acSubtotal)}`,
+        ]
+      : []),
+    `<b>Итого от: ${amount(q.total)}</b>`,
     "Итоговую цену и запись подтвердит команда CLENIX.",
-    "Согласие с условиями заявки и уведомлением о конфиденциальности: да",
-    `Отправлено: ${now.toISOString()} / ${new Intl.DateTimeFormat("ru-RU", { timeZone: "Europe/Istanbul", dateStyle: "short", timeStyle: "medium" }).format(now)} (Стамбул)`,
+    "",
+    `Отправлено: ${safe(submittedAt)} (Стамбул)`,
+    "Согласие с условиями заявки: получено",
   ];
-  // Every customer-controlled line is escaped; the only HTML is our fixed title.
-  return rows.map((line, i) => (i === 0 ? line : escapeHtml(line))).join("\n");
+  // Escape every dynamic value before adding the fixed Telegram HTML markup.
+  return rows.join("\n");
 }
 export function telegramConfigured() {
   const chatId = process.env.TELEGRAM_CHAT_ID?.trim();

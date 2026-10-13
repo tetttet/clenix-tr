@@ -192,6 +192,35 @@ test("booking mobile bar keeps price visible and navigates through validated ste
   await expect(bar.locator(".booking-mobile-price")).toContainText("1 000");
 });
 
+test("mobile submit scrolls to each missing required field", async ({ page }) => {
+  await page.setViewportSize({ width: 360, height: 800 });
+  await page.goto("/ru/book?service=ac&acUnits=2");
+  const next = page.locator(".booking-mobile-next");
+  await page.getByLabel("Район *", { exact: true }).selectOption("Beşiktaş");
+  await page.getByLabel("Улица, дом и полный адрес").fill("Test address 20");
+  await next.click();
+  await next.click();
+  await page.getByLabel("Желаемая дата").fill("2099-12-10");
+  await next.click();
+  await page.getByLabel("Ваше имя").fill("Test Customer");
+
+  await next.click();
+  await expect(page.locator("#phone-error")).toBeVisible();
+  await expect(page.locator("#phone")).toBeFocused();
+
+  await page.getByLabel("Номер телефона").fill("+7 701 123 45 67");
+  await next.click();
+  await expect(page.locator("#consent-error")).toBeVisible();
+  await expect(page.locator('input[name="consent"]')).toBeFocused();
+  await expect(page.locator(".consent")).toHaveClass(/consent-invalid/);
+  await expect.poll(async () => {
+    const box = await page.locator(".consent").boundingBox();
+    return box ? box.y + box.height : Infinity;
+  }).toBeLessThan(720);
+  const box = await page.locator(".consent").boundingBox();
+  expect(box!.y).toBeGreaterThan(100);
+});
+
 test("root redirects to Turkish and unknown pages fail gracefully", async ({
   page,
   request,

@@ -1527,6 +1527,12 @@ small {
 .consent {
   font-size: 11px;
 }
+.consent-invalid {
+  padding: 10px;
+  border: 1px solid #b43b3b;
+  border-radius: 6px;
+  background: #fff4f3;
+}
 .policy-links {
   display: flex;
   gap: 20px;

@@ -1,5 +1,5 @@
 "use client";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useForm, type FieldPath } from "react-hook-form";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
@@ -65,7 +65,8 @@ export default function BookingWizard({
     [busy, setBusy] = useState(false),
     [failure, setFailure] = useState(""),
     [reference, setReference] = useState(""),
-    [acEnabled, setAcEnabled] = useState(initial.acUnits > 0);
+    [acEnabled, setAcEnabled] = useState(initial.acUnits > 0),
+    [invalidField, setInvalidField] = useState<FieldPath<Booking> | null>(null);
   const sending = useRef(false),
     requestId = useRef(""),
     heading = useRef<HTMLHeadingElement>(null);
@@ -75,7 +76,6 @@ export default function BookingWizard({
     setValue,
     setError,
     clearErrors,
-    setFocus,
     getValues,
     formState: { errors },
   } = useForm<Booking>({
@@ -107,6 +107,19 @@ export default function BookingWizard({
   });
   const value = watch();
   const currentQuote = estimate(value.service, value.area, value.acUnits || 0);
+  useEffect(() => {
+    if (!invalidField) return;
+    const control = document.querySelector<HTMLElement>(
+      `[name="${invalidField}"]`,
+    );
+    if (!control) return;
+    control.focus({ preventScroll: true });
+    (control.closest(".consent") ?? control).scrollIntoView({
+      behavior: "smooth",
+      block: "center",
+    });
+    setInvalidField(null);
+  }, [step, invalidField]);
   function syncChoices(
     service = value.service,
     area = value.area,
@@ -157,7 +170,7 @@ export default function BookingWizard({
       const target = stepFields.findIndex((f) => f.includes(first));
       if (target >= 0 && target !== step) setStep(target);
     }
-    setTimeout(() => setFocus(first), 30);
+    setInvalidField(first);
     return null;
   }
   async function submit() {
@@ -588,7 +601,9 @@ export default function BookingWizard({
                     ))}
                   </dl>
                 </div>
-                <label className="check-label consent">
+                <label
+                  className={`check-label consent ${errors.consent ? "consent-invalid" : ""}`}
+                >
                   <input
                     type="checkbox"
                     {...register("consent")}
