@@ -177,7 +177,13 @@ test("booking mobile bar keeps price visible and navigates through validated ste
   await bar.getByRole("button", { name: "Продолжить" }).click();
   await expect(page.locator("#district-error")).toBeVisible();
   await expect(page.locator("#district option")).toHaveCount(40);
+  await expect(page.locator('#district option[value="Beşiktaş"]')).toHaveText(
+    "Beşiktaş",
+  );
   await page.getByLabel("Район *", { exact: true }).selectOption("Beşiktaş");
+  await expect(page.getByLabel("Район *", { exact: true })).toHaveValue(
+    "Beşiktaş",
+  );
   await page.getByLabel("Улица, дом и полный адрес").fill("Test address 20");
   await bar.getByRole("button", { name: "Продолжить" }).click();
   await expect(page.locator(".wizard-heading")).toContainText("02 / 04");

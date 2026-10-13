@@ -22,7 +22,7 @@ function request(body: unknown, headers: Record<string, string> = {}) {
 }
 beforeEach(() => {
   vi.stubEnv("TELEGRAM_BOT_TOKEN", "test-only-token");
-  vi.stubEnv("TELEGRAM_CHAT_ID", "123");
+  vi.stubEnv("TELEGRAM_CHAT_ID", "-1001234567890");
   vi.stubEnv("TELEGRAM_MESSAGE_THREAD_ID", "");
   vi.mocked(allowRequest).mockResolvedValue(true);
   vi.mocked(claimRequest).mockImplementation(async (_id, _f, reference) => ({
@@ -70,6 +70,7 @@ describe("Telegram and HTTP boundary", () => {
     const args = fetcher.mock.calls[0] as unknown as [string, RequestInit];
     const sent = JSON.parse(String(args[1].body));
     expect(sent.text).toContain("ИТОГО ОТ 5200 TRY");
+    expect(sent.chat_id).toBe("-1001234567890");
     expect(sent.message_thread_id).toBe(42);
     expect(sent.parse_mode).toBe("HTML");
   });
@@ -100,6 +101,15 @@ describe("Telegram and HTTP boundary", () => {
     const response = await POST(request(fixture()));
     expect(response.status).toBe(503);
     expect(await response.json()).toEqual({ code: "CONFIGURATION" });
+  });
+  it("rejects a personal chat ID without calling Telegram", async () => {
+    vi.stubEnv("TELEGRAM_CHAT_ID", "123456789");
+    const fetcher = vi.fn();
+    vi.stubGlobal("fetch", fetcher);
+    const response = await POST(request(fixture()));
+    expect(response.status).toBe(503);
+    expect(await response.json()).toEqual({ code: "CONFIGURATION" });
+    expect(fetcher).not.toHaveBeenCalled();
   });
   it("rejects wrong content type", async () =>
     expect(

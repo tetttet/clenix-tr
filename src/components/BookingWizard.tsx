@@ -468,7 +468,9 @@ export default function BookingWizard({
                       {t("chooseDistrict")}
                     </option>
                     {districts.map((d) => (
-                      <option key={d} value={d} />
+                      <option key={d} value={d}>
+                        {d}
+                      </option>
                     ))}
                   </select>
                   {errors.district && (

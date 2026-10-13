@@ -48,9 +48,12 @@ export function formatTelegram(
   return rows.map((line, i) => (i === 0 ? line : escapeHtml(line))).join("\n");
 }
 export function telegramConfigured() {
+  const chatId = process.env.TELEGRAM_CHAT_ID?.trim();
   const thread = process.env.TELEGRAM_MESSAGE_THREAD_ID;
   return (
-    !!(process.env.TELEGRAM_BOT_TOKEN && process.env.TELEGRAM_CHAT_ID) &&
+    !!process.env.TELEGRAM_BOT_TOKEN &&
+    !!chatId &&
+    /^-[1-9]\d*$/.test(chatId) &&
     (!thread ||
       (/^\d+$/.test(thread) &&
         Number.isSafeInteger(Number(thread)) &&
@@ -70,7 +73,7 @@ export async function sendTelegram(b: Booking, reference: string) {
       headers: { "Content-Type": "application/json" },
       signal: AbortSignal.timeout(10_000),
       body: JSON.stringify({
-        chat_id: process.env.TELEGRAM_CHAT_ID,
+        chat_id: process.env.TELEGRAM_CHAT_ID?.trim(),
         ...(thread ? { message_thread_id: Number(thread) } : {}),
         text: formatTelegram(b, reference),
         parse_mode: "HTML",

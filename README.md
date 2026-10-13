@@ -24,7 +24,7 @@ Set variables in `.env.local` for local use, or Vercel → Project → Settings 
 | Variable                     | Purpose                                                                                                        |
 | ---------------------------- | -------------------------------------------------------------------------------------------------------------- |
 | `TELEGRAM_BOT_TOKEN`         | Required server-only bot token                                                                                 |
-| `TELEGRAM_CHAT_ID`           | Required target personal chat or group ID; group IDs may be negative                                           |
+| `TELEGRAM_CHAT_ID`           | Required negative group chat ID; personal chat IDs are rejected                                                |
 | `TELEGRAM_MESSAGE_THREAD_ID` | Optional positive integer topic ID for a forum group                                                           |
 | `NEXT_PUBLIC_SITE_URL`       | Full public origin, e.g. your actual production Vercel URL; used for canonical URLs, sitemap and origin checks |
 | `UPSTASH_REDIS_REST_URL`     | Optional Redis REST URL; recommended for production                                                            |
@@ -35,7 +35,7 @@ Without an explicit site URL, SEO uses Vercel's production URL when available, o
 ## Telegram setup and a live test
 
 1. In Telegram, contact the official **@BotFather**, run `/newbot`, follow the prompts and copy the bot token to your server environment.
-2. For a personal target, open the new bot and send `/start`. For a group, add the bot and permit it to send messages. Send a command mentioning the bot in that group so it receives an update. Do not use a channel unless the bot has the appropriate posting permissions.
+2. Add the bot to the destination group and permit it to send messages. Send a command mentioning the bot in that group so it receives an update.
 3. Retrieve `getUpdates` privately from Telegram's API to identify `message.chat.id`. A topic message also provides `message_thread_id`. Do not paste the token into tickets, code or this README. Avoid browser URLs containing tokens because history records them. The helper below prompts for the token without echoing or placing it in shell history:
 
    ```sh
@@ -44,7 +44,7 @@ Without an explicit site URL, SEO uses Vercel's production URL when available, o
 
    The helper prints only chat IDs, titles/types and thread IDs; it does not print messages, phone numbers, token or raw API responses. `getUpdates` cannot work while a webhook is configured; use the bot's existing administration process if that applies. This helper does not alter webhooks.
 
-4. Set `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`, and optionally `TELEGRAM_MESSAGE_THREAD_ID`; restart the local server or redeploy Vercel.
+4. Set `TELEGRAM_BOT_TOKEN`, the group's negative `TELEGRAM_CHAT_ID`, and optionally `TELEGRAM_MESSAGE_THREAD_ID`; restart the local server or update the deployed environment and redeploy. A positive personal chat ID returns a configuration error without sending a message.
 5. Open `/en/book?service=deep-cleaning&area=70&acUnits=2`. Supply an address you are authorized to share, a future preferred date, your contact information and acknowledgement. Submit once.
 6. Verify the operator receives the message with **70 × 60 + 2 × 500 = 5,200 TRY starting estimate**, the district/address/contact, notes, date/time, locale and request reference. Check that the UI reports a **request sent**, not an appointment confirmed. Live delivery is not verified until this step is performed with business credentials.
 
